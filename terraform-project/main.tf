@@ -1,17 +1,22 @@
+#this block of code adds a VPC
+
 resource "google_compute_network" "vpc-network-team3" {
   name                    = "vpc-network-team"
   auto_create_subnetworks = "true"
 }
+
+#this block of codeadds an autoscaling group in a zone specified in the variables file using an instance group manager as a target
 
 resource "google_compute_autoscaler" "team3" {
     name   = "my-autoscaler-team3"
   zone   = var.zone
   target = google_compute_instance_group_manager.my-igm.self_link
   
+#section where you can defin
 
   autoscaling_policy {
-    max_replicas    = 5
-    min_replicas    = 2
+    max_replicas    = var.maximum_instances
+    min_replicas    = var.minimum_instances
     cooldown_period = 60
 
   }
