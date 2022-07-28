@@ -29,4 +29,9 @@ variable "maximum_instances" {
 }
 
 
+variable "region" {
+  type        = string
+  default     = "us-east1"
+  description = "add desired region"
+}
 

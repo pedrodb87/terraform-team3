@@ -34,6 +34,12 @@ network = google_compute_network.vpc-network-team3.name
 }
 }
 
+resource "google_compute_target_pool" "team3" {
+name = "my-target-pool"
+project = var.project_name
+region = var.region
+}
+
 resource "google_compute_instance_group_manager" "my-igm" {
 name = "my-igm"
 zone = var.zone
@@ -42,6 +48,7 @@ version {
 instance_template = google_compute_instance_template.compute-engine.self_link
 name = "primary"
 }
+target_pools = [google_compute_target_pool.team3.self_link]
 base_instance_name = "team3"
 }
 
@@ -51,7 +58,15 @@ project = "centos-cloud"
 }
 
 
-
+module "lb" {
+source = "GoogleCloudPlatform/lb/google"
+version = "2.2.0"
+region = var.region
+name = "load-balancer"
+service_port = 80
+target_tags = ["my-target-pool"]
+network = google_compute_network.vpc-network-team3.name
+}
 
 
 
