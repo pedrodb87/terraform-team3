@@ -13,7 +13,7 @@ variable "project_name" {
 variable "zone" {
   type        = string
   default     = "us-east1-b"
-  description = "description"
+  description = "zone where to deploy resource"
 }
 
 variable "minimum_instances" {
