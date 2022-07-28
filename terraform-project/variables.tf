@@ -16,3 +16,17 @@ variable "zone" {
   description = "description"
 }
 
+variable "minimum_instances" {
+  type        = number
+  default     = "1"
+  description = "description"
+}
+
+variable "maximum_instances" {
+  type        = number
+  default     = "99"
+  description = "description"
+}
+
+
+
