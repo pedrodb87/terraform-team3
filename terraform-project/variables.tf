@@ -19,13 +19,13 @@ variable "zone" {
 variable "minimum_instances" {
   type        = number
   default     = "1"
-  description = "description"
+  description = "minimum desired instances running at a given point"
 }
 
 variable "maximum_instances" {
   type        = number
   default     = "99"
-  description = "description"
+  description = "maximum desired instances running at a given point"
 }
 
 
