@@ -40,12 +40,15 @@ network = google_compute_network.vpc-network-team3.name
 }
 }
 
+#creating a target pool
+
 resource "google_compute_target_pool" "team3" {
 name = "my-target-pool"
 project = var.project_name
 region = var.region
 }
 
+#creating a group manager for the instances.
 resource "google_compute_instance_group_manager" "my-igm" {
 name = "my-igm"
 zone = var.zone
@@ -58,11 +61,14 @@ target_pools = [google_compute_target_pool.team3.self_link]
 base_instance_name = "team3"
 }
 
+#indicating the image for the instance.
+
 data "google_compute_image" "centos_7" {
 family = "centos-7"
 project = "centos-cloud"
 }
 
+#module for the load balancer.
 
 module "lb" {
 source = "GoogleCloudPlatform/lb/google"
