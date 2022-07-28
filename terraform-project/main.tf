@@ -12,7 +12,7 @@ resource "google_compute_autoscaler" "team3" {
   zone   = var.zone
   target = google_compute_instance_group_manager.my-igm.self_link
   
-#section where you can defin
+#section where you can define the number of instances running by editing the variables file under maximum or minimum
 
   autoscaling_policy {
     max_replicas    = var.maximum_instances
@@ -22,6 +22,7 @@ resource "google_compute_autoscaler" "team3" {
   }
 }
 
+#creating a machine template so the autoscaling knows what type of machine to work with.
 
 resource "google_compute_instance_template" "compute-engine" {
 name = "my-instance-template"

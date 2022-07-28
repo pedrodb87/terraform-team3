@@ -24,7 +24,7 @@ variable "minimum_instances" {
 
 variable "maximum_instances" {
   type        = number
-  default     = "99"
+  default     = "5"
   description = "maximum desired instances running at a given point"
 }
 
