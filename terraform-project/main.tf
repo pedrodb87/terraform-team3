@@ -98,31 +98,3 @@ resource "google_sql_database_instance" "database" {
 
 
 
-
-
-# resource "google_compute_instance" "pedrito-test" {
-#   name         = "pedrito"
-#   machine_type = "e2-small"
-#   zone         = "us-east1-b"
-
-#   tags = ["team", "three"]
-
-#   boot_disk {
-#     initialize_params {
-#       image = "centos-7-v20220719"
-#     }
-#   }
-
-#   // Local SSD disk
-#   # scratch_disk {
-#   #   interface = "SCSI"
-#   # }
-
-#   network_interface {
-#     network = google_compute_network.vpc-network-team3.name
-
-#     access_config {
-#       // Ephemeral public IP
-#     }
-#   }
-# }
