@@ -80,7 +80,19 @@ target_tags = ["my-target-pool"]
 network = google_compute_network.vpc-network-team3.name
 }
 
+resource "google_sql_database_instance" "database" {
+  name             = "main-database-instance"
+  database_version = var.data_base_version
+  region           = var.region
+  root_password    = var.db_password
+  deletion_protection = "false"
 
+  settings {
+    # Second-generation instance tiers are based on the machine
+    # type. See argument reference below.
+    tier = "db-f1-micro"
+  }
+}
 
 
 

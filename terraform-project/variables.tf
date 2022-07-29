@@ -10,9 +10,17 @@ variable "project_name" {
   description = "enter your project name"
 }
 
+
+variable "region" {
+  type        = string
+  default     = "us-west4"
+  description = "add desired region"
+}
+
+
 variable "zone" {
   type        = string
-  default     = "us-east1-b"
+  default     = "us-west4-b"
   description = "zone where to deploy resource"
 }
 
@@ -28,10 +36,17 @@ variable "maximum_instances" {
   description = "maximum desired instances running at a given point"
 }
 
-
-variable "region" {
+variable "data_base_version" {
   type        = string
-  default     = "us-east1"
-  description = "add desired region"
+  default     = "POSTGRES_14"
+  description = "specifies the database version"
 }
+
+
+variable "db_password" {
+  type        = string
+  default     = ""
+  description = "description"
+}
+
 
