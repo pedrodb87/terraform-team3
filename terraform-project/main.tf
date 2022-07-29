@@ -84,11 +84,12 @@ module "lb" {
 #this code of block will provision a database. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
-  name                = "main-database-instance"
+  name                = "main-database-team3"
   database_version    = var.data_base_version
   region              = var.region
   root_password       = var.db_password
   deletion_protection = "false"
+  project             = var.project_name
 
   settings {
     tier = "db-f1-micro"
