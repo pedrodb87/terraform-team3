@@ -1,9 +1,38 @@
 #this block of code adds a VPC
+# resource "google_compute_subnetwork" "network-with-private-ip-ranges" {
+#   name          = "private"
+#   ip_cidr_range = "192.168.10.0/24"
+#   # ip_cidr_range = "10.2.0.0/16"
+#   region        = var.region
+#   network       = google_compute_network.vpc-network-team3.id
+#   # secondary_ip_range {
+#   #   range_name    = "secondary-range"
+#   #   ip_cidr_range = "192.168.10.0/24"
+#   # }
+# }
+
 
 resource "google_compute_network" "vpc-network-team3" {
   name                    = "vpc-network-team"
   auto_create_subnetworks = "true"
 }
+
+resource "google_compute_firewall" "allow-traffic" {
+  name    = "test-firewall"
+  network = google_compute_network.vpc-network-team3.name
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "443", "22"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
+
 
 #this block of codeadds an autoscaling group in a zone specified in the variables file using an instance group manager as a target
 
@@ -12,7 +41,7 @@ resource "google_compute_autoscaler" "team3" {
   zone   = var.zone
   target = google_compute_instance_group_manager.my-igm.self_link
 
-  #section where you can define the number of instances running by editing the variables file under maximum or minimum
+  # section where you can define the number of instances running by editing the variables file under maximum or minimum
 
   autoscaling_policy {
     max_replicas    = var.maximum_instances
@@ -29,7 +58,9 @@ resource "google_compute_instance_template" "compute-engine" {
   machine_type   = var.machine_type
   can_ip_forward = false
   project        = var.project_name
-
+  metadata_startup_script = <<SCRIPT
+  sudo yum install httpd -y
+  SCRIPT
 
   disk {
     source_image = data.google_compute_image.centos_7.self_link
@@ -37,9 +68,12 @@ resource "google_compute_instance_template" "compute-engine" {
 
   network_interface {
     network = google_compute_network.vpc-network-team3.name
-  }
-}
+    access_config {
+     // Include this section to give the VM an external ip address
+   }
 
+}
+}
 #creating a target pool
 
 resource "google_compute_target_pool" "team3" {
@@ -84,7 +118,7 @@ module "lb" {
 #this code of block will provision a database. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
-  name                = "main-database-team3"
+  name                = "main-database-jaza"
   database_version    = var.data_base_version
   region              = var.region
   root_password       = var.db_password
