@@ -1,6 +1,6 @@
 variable "machine_type" {
   type        = string
-  default     = "e2-small"
+  default     = "e2-medium"
   description = "add your machine type"
 }
 
@@ -38,14 +38,14 @@ variable "maximum_instances" {
 
 variable "data_base_version" {
   type        = string
-  default     = "POSTGRES_14"
+  default     = "MYSQL_5_6" #MYSQL_5_6, MYSQL_5_7, MYSQL_8_0, POSTGRES_9_6,POSTGRES_10, POSTGRES_11, POSTGRES_12, POSTGRES_13, SQLSERVER_2017_STANDARD, SQLSERVER_2017_ENTERPRISE, SQLSERVER_2017_EXPRESS, SQLSERVER_2017_WEB
   description = "specifies the database version"
 }
 
 
 variable "db_password" {
   type        = string
-  default     = ""
+  default     = "admin"
   description = "description"
 }
 

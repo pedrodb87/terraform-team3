@@ -15,6 +15,7 @@
 resource "google_compute_network" "vpc-network-team3" {
   name                    = "vpc-network-team"
   auto_create_subnetworks = "true"
+  routing_mode = "GLOBAL"
 }
 
 resource "google_compute_firewall" "allow-traffic" {
@@ -27,7 +28,7 @@ resource "google_compute_firewall" "allow-traffic" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "22"]
+    ports    = ["80", "443", "22", "3306"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
@@ -58,9 +59,7 @@ resource "google_compute_instance_template" "compute-engine" {
   machine_type   = var.machine_type
   can_ip_forward = false
   project        = var.project_name
-  metadata_startup_script = <<SCRIPT
-  sudo yum install httpd -y
-  SCRIPT
+  metadata_startup_script = file("${path.module}/wordpress.sh")
 
   disk {
     source_image = data.google_compute_image.centos_7.self_link
@@ -118,7 +117,7 @@ module "lb" {
 #this code of block will provision a database. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
-  name                = "main-database-jaza"
+  name                = "pedrito"
   database_version    = var.data_base_version
   region              = var.region
   root_password       = var.db_password
@@ -131,4 +130,9 @@ resource "google_sql_database_instance" "database" {
 }
 
 
-
+resource "google_sql_user" "users" {
+  name     = "pedrobalza"
+  instance = google_sql_database_instance.database.name
+  host     = "me.com"
+  password = "admin"
+}
