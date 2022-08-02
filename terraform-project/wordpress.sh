@@ -23,4 +23,4 @@ setenforce 0
 chown -R apache:apache /var/www/html/
 # Start web server
 systemctl restart httpd
-systemctl enable http
+systemctl enable httpd

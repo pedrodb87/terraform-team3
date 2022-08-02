@@ -13,14 +13,14 @@ variable "project_name" {
 
 variable "region" {
   type        = string
-  default     = "us-west4"
+  default     = "us-east1"
   description = "add desired region"
 }
 
 
 variable "zone" {
   type        = string
-  default     = "us-west4-b"
+  default     = "us-east1-b"
   description = "zone where to deploy resource"
 }
 
