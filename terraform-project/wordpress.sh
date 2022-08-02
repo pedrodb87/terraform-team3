@@ -24,3 +24,8 @@ chown -R apache:apache /var/www/html/
 # Start web server
 systemctl restart httpd
 systemctl enable httpd
+
+export WORDPRESS_DB_HOST="34.75.123.123"
+export WORDPRESS_DB_USER="pedrobalza"
+export WORDPRESS_DB_PASSWORD="admin"
+export WORDPRESS_DB_NAME="wordpress"
