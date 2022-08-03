@@ -3,8 +3,8 @@ resource "google_compute_subnetwork" "network-ip-ranges" {
   name          = "public"
   ip_cidr_range = "192.168.10.0/24"
   # ip_cidr_range = "10.2.0.0/16"
-  region        = var.region
-  network       = google_compute_network.vpc-network-team3.id
+  region  = var.region
+  network = google_compute_network.vpc-network-team3.id
   # secondary_ip_range {
   #   range_name    = "secondary-range"
   #   ip_cidr_range = "192.168.10.0/24"
@@ -15,7 +15,7 @@ resource "google_compute_subnetwork" "network-ip-ranges" {
 resource "google_compute_network" "vpc-network-team3" {
   name                    = "vpc-network-team"
   auto_create_subnetworks = "false"
-  routing_mode = "GLOBAL"
+  routing_mode            = "GLOBAL"
 }
 
 resource "google_compute_firewall" "allow-traffic" {
@@ -30,7 +30,7 @@ resource "google_compute_firewall" "allow-traffic" {
     protocol = "tcp"
     ports    = ["80", "443", "22", "3306"]
   }
-  source_tags = ["wordpress-firewall"]
+  source_tags   = ["wordpress-firewall"]
   source_ranges = ["0.0.0.0/0"]
 }
 
@@ -51,19 +51,19 @@ resource "google_compute_autoscaler" "team3" {
     cooldown_period = 60
 
   }
-  
+
 }
 
 #creating a machine template so the autoscaling knows what type of machine to work with.
 
 resource "google_compute_instance_template" "compute-engine" {
-  name           = "my-instance-template"
-  machine_type   = var.machine_type
-  can_ip_forward = false
-  project        = var.project_name
+  name                    = "my-instance-template"
+  machine_type            = var.machine_type
+  can_ip_forward          = false
+  project                 = var.project_name
   metadata_startup_script = file("${path.module}/wordpress.sh")
 
-    tags = ["wordpress-firewall"]
+  tags = ["wordpress-firewall"]
 
   disk {
     source_image = data.google_compute_image.centos_7.self_link
@@ -72,10 +72,10 @@ resource "google_compute_instance_template" "compute-engine" {
   network_interface {
     subnetwork = google_compute_subnetwork.network-ip-ranges.id
     access_config {
-     // Include this section to give the VM an external ip address
-   }
+      // Include this section to give the VM an external ip address
+    }
 
-}
+  }
 }
 #creating a target pool
 
@@ -121,7 +121,7 @@ module "lb" {
 #this code of block will provision a database. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
-  name                = "padawan100"
+  name                = "darth"
   database_version    = var.data_base_version
   region              = var.region
   root_password       = var.db_password
@@ -132,12 +132,23 @@ resource "google_sql_database_instance" "database" {
 
   settings {
     tier = "db-f1-micro"
+
+ip_configuration {
+      ipv4_enabled = "true"
+
+      authorized_networks {
+        value           = "0.0.0.0/0"
+        name            = "pedrobalza"
+        
+      }
     
-    location_preference {
-      zone = var.zone
-    }
+    # location_preference {
+    #   zone = var.zone
+    # }
     }
 }
+}
+
 resource "google_sql_database" "database" {
   name     = "wordpress"
   instance = google_sql_database_instance.database.name
@@ -146,7 +157,7 @@ resource "google_sql_database" "database" {
 resource "google_sql_user" "users" {
   name     = "pedrobalza"
   instance = google_sql_database_instance.database.name
-  host     = "%"
+  host     = "%" 
   password = "admin"
 }
 

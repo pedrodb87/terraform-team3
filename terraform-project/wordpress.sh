@@ -14,7 +14,7 @@ yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip ph
 wget https://wordpress.org/latest.tar.gz 
 tar -xf latest.tar.gz -C /var/www/html/ 
 mv /var/www/html/wordpress/* /var/www/html/ 
-cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+# cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 #increasing the memory limit to use with wordpress
 sed -i -e "85adefine( 'WP_MEMORY_LIMIT', '256M' );" /var/www/html/wp-config.php
 getenforce 
@@ -25,7 +25,7 @@ chown -R apache:apache /var/www/html/
 systemctl restart httpd
 systemctl enable httpd
 
-export WORDPRESS_DB_HOST="34.75.123.123"
-export WORDPRESS_DB_USER="pedrobalza"
-export WORDPRESS_DB_PASSWORD="admin"
-export WORDPRESS_DB_NAME="wordpress"
+# export DB_HOST = ""
+export DB_USER = "pedrobalza"
+export DB_PASSWORD = "admin"
+export DB_NAME = "wordpress"
