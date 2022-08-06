@@ -40,7 +40,7 @@ resource "google_compute_instance_template" "compute-engine" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.network-ip-ranges.id
+    subnetwork = google_compute_network.vpc-network-team3.id
     access_config {
       // Include this section to give the VM an external ip address
     }

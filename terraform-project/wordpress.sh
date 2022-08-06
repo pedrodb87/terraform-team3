@@ -13,7 +13,7 @@ chmod 666 /var/www/html/wp-config.php
 sed 's/'database_name_here'/'wordpress'/g' /var/www/html/wp-config.php -i
 sed 's/'username_here'/'pedrobalza'/g' /var/www/html/wp-config.php -i
 sed 's/'password_here'/'admin'/g' /var/www/html/wp-config.php -i
-sed 's/'localhost'/'34.86.223.233'/g' /var/www/html/wp-config.php -i
+sed 's/'localhost'/'34.85.132.253'/g' /var/www/html/wp-config.php -i
 sed 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/sysconfig/selinux -i
 getenforce
 setenforce 0

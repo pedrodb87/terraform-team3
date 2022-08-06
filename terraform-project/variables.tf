@@ -1,6 +1,6 @@
 variable "machine_type" {
   type        = string
-  default     = "e2-medium"
+  default     = "e2-small"
   description = "add your machine type"
 }
 
@@ -118,7 +118,7 @@ variable "lb_name" {
 
 variable "dbinstance_name" {
   type        = string
-  default     = "metricunits"
+  default     = "glass"
   description = "name of database instance"
 }
 
