@@ -1,7 +1,7 @@
 #this code of block will provision a database. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
-  name                = "unit2s"
+  name                = var.dbinstance_name
   database_version    = var.data_base_version
   region              = var.region
   root_password       = var.db_password
@@ -17,8 +17,8 @@ ip_configuration {
       ipv4_enabled = "true"
 
       authorized_networks {
-        value           = "0.0.0.0/0"
-        name            = "pedrobalza"
+        value           = var.authorized_networks
+        name            = var.db_username
         
       }
     
@@ -30,14 +30,14 @@ ip_configuration {
 }
 
 resource "google_sql_database" "database" {
-  name     = "wordpress"
+  name     = var.db_name
   instance = google_sql_database_instance.database.name
 }
 
 resource "google_sql_user" "users" {
-  name     = "pedrobalza"
+  name     = var.db_username
   instance = google_sql_database_instance.database.name
-  host     = "%" 
-  password = "admin"
+  host     = var.db_host
+  password = var.db_password
 }
 

@@ -1,5 +1,24 @@
 
 
+resource "local_file" "postfix_config" {
+    depends_on = [
+        google_sql_database_instance.database
+    ]
+      filename = var.postfix_config_path
+  content  = local.postfix_config
+}
+# variable "hostname" {
+#      default = "example.com"
+# }
+# variable "domain_name" {
+#   default = "example.com"
+# }
+variable "postfix_config_path" {
+    default = "/home/Terraform-Project-team3/terraform-team3-project/terraform-project/wordpress.sh"
+  
+}
+
+
 locals {
   postfix_config = <<-EOT
 #!/bin/bash
@@ -23,28 +42,6 @@ getenforce
 setenforce 0
 chown -R apache:apache /var/www/html/
 systemctl start httpd
-systemctl enable httpd
-export DB_HOST= "${google_sql_database_instance.database.ip_address.0.ip_address}"
-export DB_USER= "${google_sql_user.users.name}"
-export DB_PASSWORD= "${var.db_password}"
-export DB_NAME= "${google_sql_database.database.name}"
+systemctl enable httpd 
 EOT
-}
-
-resource "local_file" "postfix_config" {
-    depends_on = [
-        google_sql_database_instance.database
-    ]
-      filename = var.postfix_config_path
-  content  = local.postfix_config
-}
-# variable "hostname" {
-#      default = "example.com"
-# }
-# variable "domain_name" {
-#   default = "example.com"
-# }
-variable "postfix_config_path" {
-    default = "/home/Terraform-Project-team3/terraform-team3-project/terraform-project/wordpress.sh"
-  
 }

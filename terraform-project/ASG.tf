@@ -5,7 +5,7 @@ resource "google_compute_autoscaler" "team3" {
         google_sql_database_instance.database,
         local_file.postfix_config
     ]
-  name   = "my-autoscaler-team3"
+  name   = var.ASG_name
   zone   = var.zone
   target = google_compute_instance_group_manager.my-igm.self_link
 
@@ -27,7 +27,7 @@ resource "google_compute_instance_template" "compute-engine" {
         google_sql_database_instance.database,
         local_file.postfix_config
     ]
-  name                    = "my-instance-template"
+  name                    = var.template_name
   machine_type            = var.machine_type
   can_ip_forward          = false
   project                 = var.project_name
@@ -50,14 +50,14 @@ resource "google_compute_instance_template" "compute-engine" {
 #creating a target pool
 
 resource "google_compute_target_pool" "team3" {
-  name    = "my-target-pool"
+  name    = var.targetpool_name
   project = var.project_name
   region  = var.region
 }
 
 #creating a group manager for the instances.
 resource "google_compute_instance_group_manager" "my-igm" {
-  name    = "my-igm"
+  name    = var.igm_name
   zone    = var.zone
   project = var.project_name
   version {
