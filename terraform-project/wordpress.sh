@@ -10,10 +10,10 @@ tar -xf latest.tar.gz -C /var/www/html/
 mv /var/www/html/wordpress/* /var/www/html/
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 chmod 666 /var/www/html/wp-config.php
-sed 's/'database_name_here'/'wordpress'/g' /var/www/html/wp-config.php -i
+sed 's/'database_name_here'/'random'/g' /var/www/html/wp-config.php -i
 sed 's/'username_here'/'pedrobalza'/g' /var/www/html/wp-config.php -i
 sed 's/'password_here'/'admin'/g' /var/www/html/wp-config.php -i
-sed 's/'localhost'/'34.85.132.253'/g' /var/www/html/wp-config.php -i
+sed 's/'localhost'/'34.125.195.242'/g' /var/www/html/wp-config.php -i
 sed 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/sysconfig/selinux -i
 getenforce
 setenforce 0

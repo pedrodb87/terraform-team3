@@ -1,4 +1,4 @@
-#this code of block will provision a database. specify the version, the region and the password in the variables file 
+#this code of block will provision a database instance. specify the version, the region and the password in the variables file 
 
 resource "google_sql_database_instance" "database" {
   name                = var.dbinstance_name

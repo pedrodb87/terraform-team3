@@ -13,14 +13,14 @@ variable "project_name" {
 
 variable "region" {
   type        = string
-  default     = ""
+  default     = "us-west4"
   description = "add desired region"
 }
 
 
 variable "zone" {
   type        = string
-  default     = ""
+  default     = "us-west4-b"
   description = "zone where to deploy resource"
 }
 
@@ -64,7 +64,7 @@ variable "db_host" {
 
 variable "db_name" {
   type        = string
-  default     = "wordpress"
+  default     = "random"
   description = "description"
 }
 
@@ -95,7 +95,7 @@ variable "ASG_name" {
 variable "template_name" {
   type        = string
   default     = "my-instance-template"
-  description = "desired name fot the compute instance template" 
+  description = "desired name for the compute instance template" 
 }
 
 variable "targetpool_name" {
