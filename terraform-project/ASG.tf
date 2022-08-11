@@ -3,7 +3,7 @@
 resource "google_compute_autoscaler" "team3" {
      depends_on = [
         google_sql_database_instance.database,
-        local_file.postfix_config
+        
     ]
   name   = var.ASG_name
   zone   = var.zone
@@ -25,13 +25,35 @@ resource "google_compute_autoscaler" "team3" {
 resource "google_compute_instance_template" "compute-engine" {
      depends_on = [
         google_sql_database_instance.database,
-        local_file.postfix_config
+      
     ]
   name                    = var.template_name
   machine_type            = var.machine_type
   can_ip_forward          = false
   project                 = var.project_name
-  metadata_startup_script = file("${path.module}/wordpress.sh")
+  metadata_startup_script = <<SCRIPT
+    yum install httpd wget unzip epel-release mysql -y
+    yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum -y install yum-utils
+    yum-config-manager --enable remi-php56   [Install PHP 5.6]
+    yum -y install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo
+    wget https://wordpress.org/latest.tar.gz
+    tar -xf latest.tar.gz -C /var/www/html/
+    mv /var/www/html/wordpress/* /var/www/html/
+    cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+    chmod 666 /var/www/html/wp-config.php
+    sed 's/'database_name_here'/'${google_sql_database.database.name}'/g' /var/www/html/wp-config.php -i
+    sed 's/'username_here'/'${google_sql_user.users.name}'/g' /var/www/html/wp-config.php -i
+    sed 's/'password_here'/'${var.db_password}'/g' /var/www/html/wp-config.php -i
+    sed 's/'localhost'/'${google_sql_database_instance.database.ip_address.0.ip_address}'/g' /var/www/html/wp-config.php -i
+    sed 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/sysconfig/selinux -i
+    getenforce
+    setenforce 0
+    chown -R apache:apache /var/www/html/
+    systemctl start httpd
+    systemctl enable httpd
+    SCRIPT
 
   tags = ["wordpress-firewall"]
 
