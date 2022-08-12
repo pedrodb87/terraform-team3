@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  project = "plucky-tract-350819"
+  project = var.project_name
   region  = var.region
   zone    = var.zone
 

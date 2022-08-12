@@ -1,12 +1,14 @@
-## Make sure that a project is set. You wont be able to access/create your resources without a project already set. Go to the project folder and do terraform init and terraform apply. If you get an error, make sure you have cloud API enabled. If you don’t have it available terraform will give you a link with the information to enable it. Once enabled, wait a few minutes while it propagates to the GC systems. 
+## in your CLI git clone git@github.com:pedrodb87/terraform-team3.git
+
+## in GCP you wont be able to access/create your resources without a project already set. Go to the project folder and do terraform init and terraform apply. If you get an error, make sure you have cloud API enabled. If you don’t have it available terraform will give you a link with the information to enable it. Once enabled, wait a few minutes while it propagates to the GC systems. 
 
 # Once a project is created, take note of the project name and ID. 
 		
-# Look for variables file and edit the name of the project into the default part. In our case the name of our project is : 
+# Look for variables file and edit the name of the project into the default part. In our case the ID of our project is : 
 		
 # plucky-tract-350819
 		
-#  So in our variables we will put this project name in the default section like so: 
+#  So in our variables we will put this project ID in the default section like so: 
 		
 		
 		variable "project_name" {
@@ -16,7 +18,7 @@
 		}
 		
 		
-# this part tells google to look for a project named "My Billing Account"
+# this part tells google to look for a billing account named "My Billing Account". So "My Billing Account" billing account must be created first in the console for this script to run. If there is a different billing account you would like to use for this project, you can specify it and just change the name in the block of code.
 		
 		data "google_billing_account" "acct" {
 		    display_name = "My Billing Account"
@@ -54,10 +56,16 @@
 		}
 		
 		
-# Once created make sure you see your project ID in yellow color to make sure you are inside your project and can start provisioning resources.
+# Once created make sure you see your project ID in yellow color to make sure you are inside your project and can start provisioning resources. you can also run the following command to set the environment to the right project.
+
+gcloud config set project [PROJECT_ID]
+
+## exit the project folder and make sure you are in the "terraform-project" folder and do terraform init. make sure the project Id is set in the variables file to the correct project ID you just created and do terraform apply -auto-approve and it will build all resources needed for a fully functioning three tier application.
+
+## the end result should be an autoscaler with a minimum of 1 instance with a load balancer hosting a webserver connected to a database in the backend inside a global VPC. the webserver instance will have wordpress installed and one would just need to edit the website in the backend to ones preference.
 		
-	2) Build a vpc with automatic creation of subnets:
-		a. We created a global VPC where our resources are going to be deployed. We made use of the block of code found in the terraform registry by searching for VPC.
+#	2) Build a vpc with automatic creation of subnets:
+#		a. We created a global VPC where our resources are going to be deployed. We made use of the block of code found in the terraform registry by searching for VPC.
 
 
 resource "google_compute_network" "vpc-network-team3" {
@@ -73,7 +81,7 @@ resource "google_compute_network" "vpc-network-team3" {
 		c. Create an instance image
 
 
-# this block of code adds an autoscaling group in a zone specified in the variables file using an instance group manager as a target
+# this block of code adds an autoscaling group in a zone specified in the variables file using an instance group manager as a target. this autoscaler is dependent on a SQL database. which means it will be created after the database is created. this is done to ensure that we automatically get the right credentials into our instance template.
 resource "google_compute_autoscaler" "team3" {
      depends_on = [
         google_sql_database_instance.database,
@@ -94,7 +102,9 @@ resource "google_compute_autoscaler" "team3" {
 }
 
 
-# creating a machine template so the autoscaling knows what type of machine to work with.
+# creating a machine template so the autoscaling knows what type of machine to work with. this section is dependent on the sql database instance. This is to ensure that we have the right credentials for the script that we are gonna be using for boot straping our machine. we added the tags needed for the firewall to be attached to this instance so it can be reached via the desired ports. (in our case 80 443 22 3406)
+
+
 resource "google_compute_instance_template" "compute-engine" {
      depends_on = [
         google_sql_database_instance.database,
@@ -104,7 +114,54 @@ resource "google_compute_instance_template" "compute-engine" {
   machine_type            = var.machine_type
   can_ip_forward          = false
   project                 = var.project_name
-  metadata_startup_script = file("${path.module}/wordpress.sh")
+  resource "google_compute_instance_template" "compute-engine" {
+     depends_on = [
+        google_sql_database_instance.database,
+      
+    ]
+  name                    = var.template_name
+  machine_type            = var.machine_type
+  can_ip_forward          = false
+  project                 = var.project_name
+  metadata_startup_script = <<SCRIPT
+    yum install httpd wget unzip epel-release mysql -y
+    yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum -y install yum-utils
+    yum-config-manager --enable remi-php56   [Install PHP 5.6]
+    yum -y install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo
+    wget https://wordpress.org/latest.tar.gz
+    tar -xf latest.tar.gz -C /var/www/html/
+    mv /var/www/html/wordpress/* /var/www/html/
+    cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+    chmod 666 /var/www/html/wp-config.php
+    sed 's/'database_name_here'/'${google_sql_database.database.name}'/g' /var/www/html/wp-config.php -i
+    sed 's/'username_here'/'${google_sql_user.users.name}'/g' /var/www/html/wp-config.php -i
+    sed 's/'password_here'/'${var.db_password}'/g' /var/www/html/wp-config.php -i
+    sed 's/'localhost'/'${google_sql_database_instance.database.ip_address.0.ip_address}'/g' /var/www/html/wp-config.php -i
+    sed 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/sysconfig/selinux -i
+    getenforce
+    setenforce 0
+    chown -R apache:apache /var/www/html/
+    systemctl start httpd
+    systemctl enable httpd
+    SCRIPT
+
+  tags = ["wordpress-firewall"]
+
+  disk {
+    source_image = data.google_compute_image.centos_7.self_link
+  }
+
+  network_interface {
+    network = google_compute_network.vpc-network-team3.id
+    access_config {
+      // Include this section to give the VM an external ip address
+    }
+
+  }
+}
+  
   tags = ["wordpress-firewall"]
   disk {
     source_image = data.google_compute_image.centos_7.self_link

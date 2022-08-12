@@ -118,7 +118,7 @@ variable "lb_name" {
 
 variable "dbinstance_name" {
   type        = string
-  default     = "glass"
+  default     = "kildare"
   description = "name of database instance"
 }
 
