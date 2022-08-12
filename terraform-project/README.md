@@ -67,25 +67,26 @@ gcloud config set project [PROJECT_ID]
 #	2) Build a vpc with automatic creation of subnets:
 #		a. Created a global VPC where our resources are going to be deployed. Make use of the block of code found in the terraform registry by searching for VPC.
 
-
-resource "google_compute_network" "vpc-network-team3" {
-  name                    = var.vpc_name
-  auto_create_subnetworks = "true"
-  routing_mode            = "GLOBAL"
+  resource "google_compute_network" "vpc-network-team3" {
+     name                    = var.vpc_name
+     auto_create_subnetworks = "true"
+     routing_mode            = "GLOBAL"
 }
 
 
-	1) Create an autoscaler with minimum 1 instance running
-		a. Takes from a target pool
-		b. Managed by an instance group manager
-		c. Create an instance image
+## Create an autoscaler with minimum 1 instance running
+##	a. Takes from a target pool
+##		b. Managed by an instance group manager
+##		c. Create an instance image
 
 
 # this block of code adds an autoscaling group in a zone specified in the variables file using an instance group manager as a target. this autoscaler is dependent on a SQL database. which means it will be created after the database is created. this is done to ensure that we automatically get the right credentials into our instance template metadata script.
-resource "google_compute_autoscaler" "team3" {
-     depends_on = [
-        google_sql_database_instance.database,
-        local_file.postfix_config
+
+
+  resource "google_compute_autoscaler" "team3" {
+       depends_on = [
+          google_sql_database_instance.database,
+          local_file.postfix_config
     ]
   name   = var.ASG_name
   zone   = var.zone
@@ -94,7 +95,8 @@ resource "google_compute_autoscaler" "team3" {
 
 
 # section where you can define the number of instances running by editing the variables file under maximum or minimum
-  autoscaling_policy {
+  
+autoscaling_policy {
     max_replicas    = var.maximum_instances
     min_replicas    = var.minimum_instances
     cooldown_period = 60
@@ -177,39 +179,41 @@ resource "google_compute_instance_template" "compute-engine" {
 
 
 # creating a target pool
-resource "google_compute_target_pool" "team3" {
-  name    = var.targetpool_name
-  project = var.project_name
-  region  = var.region
+  resource "google_compute_target_pool" "team3" {
+    name    = var.targetpool_name
+    project = var.project_name
+    region  = var.region
 }
 
 
 
 # creating a group manager for the instances.
-resource "google_compute_instance_group_manager" "my-igm" {
-  name    = var.igm_name
-  zone    = var.zone
-  project = var.project_name
-  version {
-    instance_template = google_compute_instance_template.compute-engine.self_link
-    name              = "primary"
+  resource "google_compute_instance_group_manager" "my-igm" {
+    name    = var.igm_name
+    zone    = var.zone
+    project = var.project_name
+    version {
+      instance_template = google_compute_instance_template.compute-engine.self_link
+      name              = "primary"
   }
-  target_pools       = [google_compute_target_pool.team3.self_link]
-  base_instance_name = "team3"
+    target_pools       = [google_compute_target_pool.team3.self_link]
+    base_instance_name = "team3"
 }
 
 
 # indicating the image for the instance.
-data "google_compute_image" "centos_7" {
-  family  = "centos-7"
-  project = "centos-cloud"
+ 
+ data "google_compute_image" "centos_7" {
+    family  = "centos-7"
+    project = "centos-cloud"
 }
 
-	1) Creation of a load balancer targeting the pool
-We used a module to create our load balancer and aim it to the pool created by the autoscaler and selecting it to operate in our VPC.
+##	Creation of a load balancer targeting the pool
+## We used a module to create our load balancer and aim it to the pool  created by the autoscaler and selecting it to operate in our VPC.
 
 
 # module for the load balancer.
+
 module "lb" {
   source       = "GoogleCloudPlatform/lb/google"
   version      = "2.2.0"
@@ -223,6 +227,7 @@ module "lb" {
 # Create a database instance into which our database is gonna be created. The code is dynamic and will allow us to change the name, version, region, password and project.  Make sure this database can accept traffic from specified networks by modifying the settings, ipv4 enabled and specifying the authorized networks. This is the user and the allowed ip range for this user. 
 
 # this code of block will provision a database instance. specify the version, the region and the password in the variables file 
+
 resource "google_sql_database_instance" "database" {
   name                = var.dbinstance_name
   database_version    = var.data_base_version
