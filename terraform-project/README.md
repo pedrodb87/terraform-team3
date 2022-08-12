@@ -8,7 +8,7 @@
 		
 # plucky-tract-350819
 		
-#  So in our variables we will put this project ID in the default section like so: 
+#  So in variables for the example case we put this project ID in the default section like so: 
 		
 		
 		variable "project_name" {
@@ -65,7 +65,7 @@ gcloud config set project [PROJECT_ID]
 ## the end result should be an autoscaler with a minimum of 1 instance with a load balancer hosting a webserver connected to a database in the backend inside a global VPC. the webserver instance will have wordpress installed and one would just need to edit the website in the backend to ones preference.
 		
 #	2) Build a vpc with automatic creation of subnets:
-#		a. We created a global VPC where our resources are going to be deployed. We made use of the block of code found in the terraform registry by searching for VPC.
+#		a. Created a global VPC where our resources are going to be deployed. Make use of the block of code found in the terraform registry by searching for VPC.
 
 
 resource "google_compute_network" "vpc-network-team3" {
@@ -81,7 +81,7 @@ resource "google_compute_network" "vpc-network-team3" {
 		c. Create an instance image
 
 
-# this block of code adds an autoscaling group in a zone specified in the variables file using an instance group manager as a target. this autoscaler is dependent on a SQL database. which means it will be created after the database is created. this is done to ensure that we automatically get the right credentials into our instance template.
+# this block of code adds an autoscaling group in a zone specified in the variables file using an instance group manager as a target. this autoscaler is dependent on a SQL database. which means it will be created after the database is created. this is done to ensure that we automatically get the right credentials into our instance template metadata script.
 resource "google_compute_autoscaler" "team3" {
      depends_on = [
         google_sql_database_instance.database,
@@ -102,7 +102,7 @@ resource "google_compute_autoscaler" "team3" {
 }
 
 
-# creating a machine template so the autoscaling knows what type of machine to work with. this section is dependent on the sql database instance. This is to ensure that we have the right credentials for the script that we are gonna be using for boot straping our machine. we added the tags needed for the firewall to be attached to this instance so it can be reached via the desired ports. (in our case 80 443 22 3406)
+# creating a machine template so the autoscaling knows what type of machine to work with. this section is dependent on the database instance. This is to ensure that we have the right credentials for the script that is going to be used for boot straping our machine. we must add the tags needed for the firewall to be attached to this instance so it can be reached via the desired ports. (in our case 80 443 22 3406)
 
 
 resource "google_compute_instance_template" "compute-engine" {
