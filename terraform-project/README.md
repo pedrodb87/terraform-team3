@@ -1,5 +1,7 @@
 ## in your CLI git clone git@github.com:pedrodb87/terraform-team3.git
 
+## 11 min  VIDEO EXPLANATION available at: https://youtu.be/Jb3lalGZWSQ
+
 ## in GCP you wont be able to access/create your resources without a project already set. Go to the project folder and do terraform init and terraform apply. If you get an error, make sure you have cloud API enabled. If you don’t have it available terraform will give you a link with the information to enable it. Once enabled, wait a few minutes while it propagates to the GC systems. 
 
 # Once a project is created, take note of the project name and ID. 
